@@ -1,0 +1,7 @@
+/docker/data
+/docker/kafka
+/docker/zookeeper
+/docker/logs
+
+.vscode
+.idea

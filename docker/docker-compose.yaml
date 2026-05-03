@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  jobmanager:
+    image: flink:1.18.1
+    container_name: flink-jobmanager
+    hostname: jobmanager
+    ports:
+      - "6123:6123"
+      - "8081:8081"
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+      - JOB_MANAGER_RPC_PORT=6123
+      - JOB_MANAGER_BIND_HOST=0.0.0.0
+      - TASK_MANAGER_BIND_HOST=0.0.0.0
+      - TASK_MANAGER_RPC_PORT=6122
+      - TASK_MANAGER_MEMORY_PROCESS_SIZE=1728m
+      - JOB_MANAGER_MEMORY_PROCESS_SIZE=1600m
+    command: jobmanager
+    networks:
+      - flink-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - ./data:/data
+      - ./logs:/opt/flink/logs
+
+  taskmanager1:
+    image: flink:1.18.1
+    container_name: flink-taskmanager-1
+    hostname: taskmanager1
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+      - JOB_MANAGER_RPC_PORT=6123
+      - JOB_MANAGER_BIND_HOST=0.0.0.0
+      - TASK_MANAGER_BIND_HOST=0.0.0.0
+      - TASK_MANAGER_RPC_PORT=6122
+      - TASK_MANAGER_MEMORY_PROCESS_SIZE=1728m
+      - JOB_MANAGER_MEMORY_PROCESS_SIZE=1600m
+    command: taskmanager
+    networks:
+      - flink-network
+    volumes:
+      - ./data:/data
+      - ./logs:/opt/flink/logs
+
+  taskmanager2:
+    image: flink:1.18.1
+    container_name: flink-taskmanager-2
+    hostname: taskmanager2
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+      - JOB_MANAGER_RPC_PORT=6123
+      - JOB_MANAGER_BIND_HOST=0.0.0.0
+      - TASK_MANAGER_BIND_HOST=0.0.0.0
+      - TASK_MANAGER_RPC_PORT=6122
+      - TASK_MANAGER_MEMORY_PROCESS_SIZE=1728m
+      - JOB_MANAGER_MEMORY_PROCESS_SIZE=1600m
+    command: taskmanager
+    networks:
+      - flink-network
+    volumes:
+      - ./data:/data
+      - ./logs:/opt/flink/logs
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - flink-network
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-datalog:/var/lib/zookeeper/log
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 1
+    networks:
+      - flink-network
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "bash", "-c", "kafka-broker-api-versions.sh --bootstrap-server kafka:29092"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  flink-network:
+    driver: bridge
+
+volumes:
+  data:
+  logs:
+  kafka-data:
+  zookeeper-data:
+  zookeeper-datalog:
