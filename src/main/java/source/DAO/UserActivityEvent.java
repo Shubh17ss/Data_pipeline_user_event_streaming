@@ -22,4 +22,8 @@ package source.DAO;
         public String getUserId() {
             return userId;
         }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
     }
