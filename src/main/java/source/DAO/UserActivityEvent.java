@@ -26,4 +26,8 @@ package source.DAO;
         public long getTimestamp() {
             return timestamp;
         }
+
+        public String getEventType() {
+            return eventType;
+        }
     }

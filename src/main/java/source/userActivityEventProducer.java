@@ -61,9 +61,9 @@ public class userActivityEventProducer {
         
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
             
-        String[] eventTypes = {"page_view", "click", "scroll", "form_submit", "logout", "login"};
+        String[] eventTypes = {"click", "click", "scroll", "click", "click", "click"};
         String[] pageIds = {"home", "product", "checkout", "cart", "profile", "settings", "dashboard"};
-        int[] userIds = {101, 102, 103, 104, 105, 106, 107, 108, 109, 110};
+        int[] userIds = {102, 102, 102, 102, 102, 101, 102, 101, 102, 101};
 
         Random random = new Random();
 
