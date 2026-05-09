@@ -78,7 +78,7 @@ public class userActivityEventProducer {
             long timestamp = System.currentTimeMillis();
 
             // Create the event object
-            UserActivityEvent event = new UserActivityEvent(eventId,eventType, pageId, timestamp);
+            UserActivityEvent event = new UserActivityEvent(userId,eventId,eventType, pageId, timestamp);
 
             try {
                 // Convert event to JSON string

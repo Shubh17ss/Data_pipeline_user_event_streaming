@@ -1,3 +1,4 @@
 source\flinkProcess.class
 source\DAO\UserActivityEvent.class
 source\userActivityEventProducer.class
+source\flinkProcess$1.class
