@@ -56,6 +56,7 @@ public class flinkUserClicksFlag {
 
         KeyedStream<UserActivityEvent, String> keyedClickedDataStream=clickedDataStream.keyBy(UserActivityEvent::getUserId);
 
+        //main alerting logic : if a user clicks more than 10 times in a 30 second window, we flag it as suspicious behavior.
         DataStream<String> alerts=keyedClickedDataStream.window(SlidingEventTimeWindows.of(Time.seconds(30), Time.seconds(5))) //
         .process(new ProcessWindowFunction<UserActivityEvent, String, String, TimeWindow>() {
             @Override

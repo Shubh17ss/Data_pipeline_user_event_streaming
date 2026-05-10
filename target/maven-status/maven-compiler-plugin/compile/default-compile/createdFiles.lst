@@ -3,6 +3,8 @@ source\flinkUserClicksFlag.class
 source\userActivityEventProducer.class
 source\flinkProcess.class
 source\DAO\UserActivityEvent.class
+source\flinkSessionTimeOut$1.class
+source\flinkSessionTimeOut.class
 source\flinkEventTimeProcess.class
 source\flinkEventTimeProcess$1.class
 source\flinkProcess$1.class
